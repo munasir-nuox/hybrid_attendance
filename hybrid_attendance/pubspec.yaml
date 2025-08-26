@@ -1,11 +1,28 @@
 name: hybrid_attendance
-description: "A Flutter plugin for hybrid attendance system using Bluetooth and Location services."
-version: 0.0.1
+description: A Flutter plugin for hybrid attendance system using Bluetooth Low Energy (BLE) and Location services with automatic permission handling.
+version: 1.0.0
 homepage: https://github.com/yourusername/hybrid_attendance
+repository: https://github.com/yourusername/hybrid_attendance
+issue_tracker: https://github.com/yourusername/hybrid_attendance/issues
+documentation: https://github.com/yourusername/hybrid_attendance#readme
 
 environment:
   sdk: ^3.8.1
   flutter: '>=3.3.0'
+
+topics:
+  - attendance
+  - bluetooth
+  - ble
+  - location
+  - gps
+  - permissions
+  - hybrid
+  - tracking
+
+platforms:
+  android:
+  ios:
 
 dependencies:
   flutter:

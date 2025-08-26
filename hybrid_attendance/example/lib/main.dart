@@ -34,7 +34,7 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
   // Configuration
   final List<String> _bleDeviceNames = ['Office-Beacon-1', 'Office-Beacon-2'];
   final List<LocationPoint> _locations = [
-    const LocationPoint(37.7749, -122.4194), // San Francisco
+    const LocationPoint(11.247798116962922, 75.83405685580728), // San Francisco
     const LocationPoint(40.7128, -74.0060), // New York
   ];
   int _radiusMeters = 100;
