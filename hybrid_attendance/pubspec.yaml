@@ -13,12 +13,9 @@ environment:
 topics:
   - attendance
   - bluetooth
-  - ble
   - location
-  - gps
   - permissions
   - hybrid
-  - tracking
 
 platforms:
   android:
