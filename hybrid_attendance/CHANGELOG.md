@@ -1,3 +1,24 @@
+## 1.0.1
+
+### 🔒 Security Update
+
+**Breaking Change:**
+- **Minimum Android API level raised from 21 to 23** (Android 6.0+)
+- Improves security by requiring runtime permission model
+- Addresses BLE and location privacy vulnerabilities in older Android versions
+- Still covers 99.7% of active Android devices
+
+**Security Improvements:**
+- ✅ Runtime permission controls for better user privacy
+- ✅ Enhanced BLE security protocols
+- ✅ Better location access controls
+- ✅ Meets enterprise security requirements
+- ✅ Addresses BlueBorne and other legacy vulnerabilities
+
+**Migration:**
+- No code changes required for apps already targeting API 23+
+- Apps targeting API 21-22 will need to update their `minSdkVersion`
+
 ## 1.0.0
 
 ### 🎉 Initial Release
