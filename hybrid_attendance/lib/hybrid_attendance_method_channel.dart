@@ -23,7 +23,7 @@ class MethodChannelHybridAttendance extends HybridAttendancePlatform {
   @override
   Future<AttendanceResult> checkAttendance(AttendanceConfig config) async {
     try {
-      final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
+      final result = await methodChannel.invokeMethod(
         'checkAttendance',
         config.toJson(),
       );
@@ -34,9 +34,30 @@ class MethodChannelHybridAttendance extends HybridAttendancePlatform {
         );
       }
 
-      final statusString = result['status'] as String?;
-      final message = result['message'] as String?;
-      final data = result['data'] as Map<String, dynamic>?;
+      // Safely convert the result to Map<String, dynamic>
+      final Map<String, dynamic> convertedResult = {};
+      if (result is Map) {
+        result.forEach((key, value) {
+          if (key is String) {
+            convertedResult[key] = value;
+          }
+        });
+      }
+
+      final statusString = convertedResult['status'] as String?;
+      final message = convertedResult['message'] as String?;
+
+      // Handle nested data map
+      Map<String, dynamic>? data;
+      final rawData = convertedResult['data'];
+      if (rawData is Map) {
+        data = {};
+        rawData.forEach((key, value) {
+          if (key is String) {
+            data![key] = value;
+          }
+        });
+      }
 
       final status = _parseAttendanceStatus(statusString);
 
@@ -56,12 +77,25 @@ class MethodChannelHybridAttendance extends HybridAttendancePlatform {
   @override
   Future<Map<String, dynamic>> requestPermissions() async {
     try {
-      final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
-        'requestPermissions',
-      );
+      final result = await methodChannel.invokeMethod('requestPermissions');
 
-      return result ??
-          {'granted': false, 'message': 'No response from platform'};
+      if (result == null) {
+        return {'granted': false, 'message': 'No response from platform'};
+      }
+
+      // Safely convert the result to Map<String, dynamic>
+      final Map<String, dynamic> convertedResult = {};
+      if (result is Map) {
+        result.forEach((key, value) {
+          if (key is String) {
+            convertedResult[key] = value;
+          }
+        });
+      }
+
+      return convertedResult.isNotEmpty
+          ? convertedResult
+          : {'granted': false, 'message': 'Invalid response format'};
     } on PlatformException catch (e) {
       return {'granted': false, 'message': 'Platform error: ${e.message}'};
     } catch (e) {

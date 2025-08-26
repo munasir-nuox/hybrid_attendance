@@ -39,7 +39,7 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_blue_plus_darwin: 904ed52825285a15f60e9d90312337a09f11a785
   geolocator_apple: 66b711889fd333205763b83c9dcf0a57a28c7afd
-  hybrid_attendance: 4f67e9f2e5cd39541744ba09a43ee436f252acbb
+  hybrid_attendance: 7a2c488f06478fe2aabdca8d6bd14be4c984d3a8
   integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
 
