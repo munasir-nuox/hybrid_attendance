@@ -22,6 +22,8 @@ public class HybridAttendancePlugin: NSObject, FlutterPlugin {
             result("iOS " + UIDevice.current.systemVersion)
         case "checkAttendance":
             handleCheckAttendance(call: call, result: result)
+        case "requestPermissions":
+            handleRequestPermissions(result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -47,6 +49,33 @@ public class HybridAttendancePlugin: NSObject, FlutterPlugin {
         // Perform attendance check
         performAttendanceCheck(config: config) { attendanceResult in
             result(attendanceResult)
+        }
+    }
+
+    /// Handles the requestPermissions method call from Flutter.
+    private func handleRequestPermissions(result: @escaping FlutterResult) {
+        if permissionManager.hasAllPermissions() {
+            result([
+                "granted": true,
+                "message": "All permissions already granted"
+            ])
+            return
+        }
+
+        // Request location permissions (Bluetooth permissions are handled automatically)
+        permissionManager.requestLocationPermissions()
+
+        // Check permissions after a short delay to allow the permission dialog to be processed
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            let hasPermissions = self.permissionManager.hasAllPermissions()
+            let message = hasPermissions ?
+                "All permissions granted" :
+                self.permissionManager.getMissingPermissionsDescription()
+
+            result([
+                "granted": hasPermissions,
+                "message": message
+            ])
         }
     }
 }

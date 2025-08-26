@@ -37,4 +37,13 @@ abstract class HybridAttendancePlatform extends PlatformInterface {
   Future<AttendanceResult> checkAttendance(AttendanceConfig config) {
     throw UnimplementedError('checkAttendance() has not been implemented.');
   }
+
+  /// Requests necessary permissions from the user.
+  ///
+  /// Returns a map with 'granted' (bool) and 'message' (String) keys.
+  /// This should be called before attempting to check attendance if
+  /// permissions are not already granted.
+  Future<Map<String, dynamic>> requestPermissions() {
+    throw UnimplementedError('requestPermissions() has not been implemented.');
+  }
 }

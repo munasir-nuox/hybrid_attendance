@@ -56,4 +56,23 @@ class HybridAttendance {
   }) {
     return HybridAttendancePlatform.instance.checkAttendance(config);
   }
+
+  /// Requests necessary permissions from the user.
+  ///
+  /// Returns a map with 'granted' (bool) and 'message' (String) keys.
+  /// This should be called before attempting to check attendance if
+  /// permissions are not already granted.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await HybridAttendance.requestPermissions();
+  /// if (result['granted'] == true) {
+  ///   // Permissions granted, can proceed with attendance check
+  /// } else {
+  ///   // Show error message: result['message']
+  /// }
+  /// ```
+  static Future<Map<String, dynamic>> requestPermissions() {
+    return HybridAttendancePlatform.instance.requestPermissions();
+  }
 }

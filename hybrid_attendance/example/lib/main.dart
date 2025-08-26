@@ -83,6 +83,20 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
     });
 
     try {
+      // First, request permissions
+      final permissionResult = await HybridAttendance.requestPermissions();
+
+      if (permissionResult['granted'] != true) {
+        setState(() {
+          _lastResult = AttendanceResult.failedPermissions(
+            message:
+                permissionResult['message'] as String? ??
+                'Permissions not granted',
+          );
+        });
+        return;
+      }
+
       final config = AttendanceConfig(
         bleDeviceNames: _bleDeviceNames,
         locations: _locations,

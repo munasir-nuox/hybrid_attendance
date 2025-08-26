@@ -53,6 +53,22 @@ class MethodChannelHybridAttendance extends HybridAttendancePlatform {
     }
   }
 
+  @override
+  Future<Map<String, dynamic>> requestPermissions() async {
+    try {
+      final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
+        'requestPermissions',
+      );
+
+      return result ??
+          {'granted': false, 'message': 'No response from platform'};
+    } on PlatformException catch (e) {
+      return {'granted': false, 'message': 'Platform error: ${e.message}'};
+    } catch (e) {
+      return {'granted': false, 'message': 'Unexpected error: $e'};
+    }
+  }
+
   /// Parses a string representation of attendance status to [AttendanceStatus] enum.
   AttendanceStatus _parseAttendanceStatus(String? statusString) {
     switch (statusString) {

@@ -13,6 +13,10 @@ class MockHybridAttendancePlatform
   @override
   Future<AttendanceResult> checkAttendance(AttendanceConfig config) =>
       Future.value(AttendanceResult.successBle(deviceName: 'Test Device'));
+
+  @override
+  Future<Map<String, dynamic>> requestPermissions() =>
+      Future.value({'granted': true, 'message': 'All permissions granted'});
 }
 
 void main() {

@@ -4,6 +4,7 @@ import android.content.Context
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -12,7 +13,7 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.suspendCoroutine
 
 /** HybridAttendancePlugin */
-class HybridAttendancePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
+class HybridAttendancePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.RequestPermissionsResultListener {
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -28,6 +29,9 @@ class HybridAttendancePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   // Coroutine scope for async operations
   private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+  // Pending permission result
+  private var pendingPermissionResult: Result? = null
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     context = flutterPluginBinding.applicationContext
@@ -48,6 +52,9 @@ class HybridAttendancePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       "checkAttendance" -> {
         handleCheckAttendance(call, result)
       }
+      "requestPermissions" -> {
+        handleRequestPermissions(result)
+      }
       else -> {
         result.notImplemented()
       }
@@ -62,6 +69,7 @@ class HybridAttendancePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   // ActivityAware implementation
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activityBinding = binding
+    binding.addRequestPermissionsResultListener(this)
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
@@ -70,9 +78,11 @@ class HybridAttendancePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     activityBinding = binding
+    binding.addRequestPermissionsResultListener(this)
   }
 
   override fun onDetachedFromActivity() {
+    activityBinding?.removeRequestPermissionsResultListener(this)
     activityBinding = null
   }
 
@@ -105,6 +115,55 @@ class HybridAttendancePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         result.error("ATTENDANCE_ERROR", "Error during attendance check: ${e.message}", null)
       }
     }
+  }
+
+  /**
+   * Handles the requestPermissions method call from Flutter.
+   */
+  private fun handleRequestPermissions(result: Result) {
+    if (permissionManager.hasAllPermissions()) {
+      result.success(mapOf(
+        "granted" to true,
+        "message" to "All permissions already granted"
+      ))
+      return
+    }
+
+    val activity = activityBinding?.activity
+    if (activity == null) {
+      result.error("NO_ACTIVITY", "No activity available for permission request", null)
+      return
+    }
+
+    // Store the result for later use in permission callback
+    pendingPermissionResult = result
+
+    // Request permissions
+    permissionManager.requestPermissions(activity)
+  }
+
+  // PluginRegistry.RequestPermissionsResultListener implementation
+  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray): Boolean {
+    if (requestCode == PermissionManager.PERMISSION_REQUEST_CODE && pendingPermissionResult != null) {
+      val allGranted = grantResults.all { it == android.content.pm.PackageManager.PERMISSION_GRANTED }
+
+      if (allGranted) {
+        pendingPermissionResult!!.success(mapOf(
+          "granted" to true,
+          "message" to "All permissions granted"
+        ))
+      } else {
+        val missingPermissions = permissionManager.getMissingPermissionsDescription()
+        pendingPermissionResult!!.success(mapOf(
+          "granted" to false,
+          "message" to missingPermissions
+        ))
+      }
+
+      pendingPermissionResult = null
+      return true
+    }
+    return false
   }
 
   /**
